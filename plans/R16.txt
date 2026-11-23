@@ -1,0 +1,32 @@
+# R16 · Read progress by topic IDs for stuck hints
+
+PREPARE trellis_query AS
+SELECT "public"."Progress"."id", "public"."Progress"."userId", "public"."Progress"."topicId", "public"."Progress"."status"::text, "public"."Progress"."note", "public"."Progress"."updatedAt" FROM "public"."Progress" WHERE ("public"."Progress"."userId" = $1 AND "public"."Progress"."topicId" IN ($2,$3)) OFFSET $4;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 4, 5, 0);
+ROLLBACK;
+
+Run 1
+Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..14.36 rows=2 width=84) (actual time=0.009..0.009 rows=2 loops=1)
+  Index Cond: (("userId" = 500) AND ("topicId" = ANY ('{4,5}'::integer[])))
+  Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=142
+Planning Time: 0.185 ms
+Execution Time: 0.016 ms
+
+Run 2
+Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..14.36 rows=2 width=84) (actual time=0.002..0.002 rows=2 loops=1)
+  Index Cond: (("userId" = 500) AND ("topicId" = ANY ('{4,5}'::integer[])))
+  Buffers: shared hit=3
+Planning Time: 0.018 ms
+Execution Time: 0.004 ms
+
+Run 3
+Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..14.36 rows=2 width=84) (actual time=0.002..0.002 rows=2 loops=1)
+  Index Cond: (("userId" = 500) AND ("topicId" = ANY ('{4,5}'::integer[])))
+  Buffers: shared hit=3
+Planning Time: 0.017 ms
+Execution Time: 0.004 ms

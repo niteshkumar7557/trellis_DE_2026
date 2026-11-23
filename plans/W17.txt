@@ -1,0 +1,69 @@
+# W17 · Delete prerequisite links for a subject (seed script)
+
+PREPARE trellis_query AS
+DELETE FROM "public"."TopicPrerequisite" WHERE EXISTS(SELECT "t0"."id" FROM "public"."Topic" AS "t0" WHERE ("t0"."subjectId" = $1 AND ("public"."TopicPrerequisite"."topicId") = ("t0"."id") AND "t0"."id" IS NOT NULL));
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(1);
+ROLLBACK;
+
+Run 1
+Delete on "TopicPrerequisite"  (cost=4.08..5.79 rows=0 width=0) (actual time=0.034..0.034 rows=0 loops=1)
+  Buffers: shared hit=23
+  ->  Hash Join  (cost=4.08..5.79 rows=19 width=12) (actual time=0.018..0.024 rows=19 loops=1)
+        Hash Cond: ("TopicPrerequisite"."topicId" = t0.id)
+        Buffers: shared hit=4
+        ->  Seq Scan on "TopicPrerequisite"  (cost=0.00..1.56 rows=56 width=10) (actual time=0.004..0.006 rows=56 loops=1)
+              Buffers: shared hit=1
+        ->  Hash  (cost=3.80..3.80 rows=22 width=10) (actual time=0.009..0.009 rows=15 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on "Topic" t0  (cost=0.00..3.80 rows=22 width=10) (actual time=0.001..0.004 rows=15 loops=1)
+                    Filter: ("subjectId" = 1)
+                    Rows Removed by Filter: 28
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=244
+Planning Time: 0.366 ms
+Execution Time: 0.068 ms
+
+Run 2
+Delete on "TopicPrerequisite"  (cost=4.08..5.79 rows=0 width=0) (actual time=0.018..0.018 rows=0 loops=1)
+  Buffers: shared hit=23
+  ->  Hash Join  (cost=4.08..5.79 rows=19 width=12) (actual time=0.008..0.013 rows=19 loops=1)
+        Hash Cond: ("TopicPrerequisite"."topicId" = t0.id)
+        Buffers: shared hit=4
+        ->  Seq Scan on "TopicPrerequisite"  (cost=0.00..1.56 rows=56 width=10) (actual time=0.002..0.004 rows=56 loops=1)
+              Buffers: shared hit=1
+        ->  Hash  (cost=3.80..3.80 rows=22 width=10) (actual time=0.005..0.005 rows=15 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on "Topic" t0  (cost=0.00..3.80 rows=22 width=10) (actual time=0.001..0.003 rows=15 loops=1)
+                    Filter: ("subjectId" = 1)
+                    Rows Removed by Filter: 28
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=10
+Planning Time: 0.058 ms
+Execution Time: 0.024 ms
+
+Run 3
+Delete on "TopicPrerequisite"  (cost=4.08..5.79 rows=0 width=0) (actual time=0.013..0.013 rows=0 loops=1)
+  Buffers: shared hit=23
+  ->  Hash Join  (cost=4.08..5.79 rows=19 width=12) (actual time=0.007..0.011 rows=19 loops=1)
+        Hash Cond: ("TopicPrerequisite"."topicId" = t0.id)
+        Buffers: shared hit=4
+        ->  Seq Scan on "TopicPrerequisite"  (cost=0.00..1.56 rows=56 width=10) (actual time=0.001..0.003 rows=56 loops=1)
+              Buffers: shared hit=1
+        ->  Hash  (cost=3.80..3.80 rows=22 width=10) (actual time=0.004..0.004 rows=15 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=3
+              ->  Seq Scan on "Topic" t0  (cost=0.00..3.80 rows=22 width=10) (actual time=0.001..0.003 rows=15 loops=1)
+                    Filter: ("subjectId" = 1)
+                    Rows Removed by Filter: 28
+                    Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=10
+Planning Time: 0.034 ms
+Execution Time: 0.016 ms

@@ -1,0 +1,35 @@
+# R8 · List topics in a subject
+
+PREPARE trellis_query AS
+SELECT "public"."Topic"."id", "public"."Topic"."subjectId", "public"."Topic"."slug", "public"."Topic"."name", "public"."Topic"."summary", "public"."Topic"."mistakes" FROM "public"."Topic" WHERE "public"."Topic"."subjectId" = $1 OFFSET $2;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(1, 0);
+ROLLBACK;
+
+Run 1
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=22 width=262) (actual time=0.003..0.008 rows=15 loops=1)
+  Filter: ("subjectId" = 1)
+  Rows Removed by Filter: 28
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=132
+Planning Time: 0.183 ms
+Execution Time: 0.012 ms
+
+Run 2
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=22 width=262) (actual time=0.001..0.002 rows=15 loops=1)
+  Filter: ("subjectId" = 1)
+  Rows Removed by Filter: 28
+  Buffers: shared hit=3
+Planning Time: 0.013 ms
+Execution Time: 0.004 ms
+
+Run 3
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=22 width=262) (actual time=0.002..0.003 rows=15 loops=1)
+  Filter: ("subjectId" = 1)
+  Rows Removed by Filter: 28
+  Buffers: shared hit=3
+Planning Time: 0.013 ms
+Execution Time: 0.005 ms

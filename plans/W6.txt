@@ -1,0 +1,38 @@
+# W6 · Delete a refresh token on logout
+
+PREPARE trellis_query AS
+DELETE FROM "public"."RefreshToken" WHERE "public"."RefreshToken"."tokenHash" = $1;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('benchmark-token-500');
+ROLLBACK;
+
+Run 1
+Delete on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.018..0.018 rows=0 loops=1)
+  Buffers: shared hit=6
+  ->  Index Scan using "RefreshToken_tokenHash_key" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=6) (actual time=0.008..0.011 rows=1 loops=1)
+        Index Cond: ("tokenHash" = 'benchmark-token-500'::text)
+        Buffers: shared hit=5
+Planning:
+  Buffers: shared hit=84
+Planning Time: 0.149 ms
+Execution Time: 0.046 ms
+
+Run 2
+Delete on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.004..0.004 rows=0 loops=1)
+  Buffers: shared hit=4
+  ->  Index Scan using "RefreshToken_tokenHash_key" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=6) (actual time=0.003..0.003 rows=1 loops=1)
+        Index Cond: ("tokenHash" = 'benchmark-token-500'::text)
+        Buffers: shared hit=3
+Planning Time: 0.012 ms
+Execution Time: 0.007 ms
+
+Run 3
+Delete on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.005..0.005 rows=0 loops=1)
+  Buffers: shared hit=4
+  ->  Index Scan using "RefreshToken_tokenHash_key" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=6) (actual time=0.003..0.003 rows=1 loops=1)
+        Index Cond: ("tokenHash" = 'benchmark-token-500'::text)
+        Buffers: shared hit=3
+Planning Time: 0.010 ms
+Execution Time: 0.008 ms

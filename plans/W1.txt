@@ -1,0 +1,35 @@
+# W1 · Create a password account
+
+PREPARE trellis_query AS
+INSERT INTO "public"."User" ("email","name","passwordHash","role","createdAt") VALUES ($1,$2,$3,CAST($4::text AS "public"."Role"),$5) RETURNING "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('password-new@example.test', 'New student', 'benchmark-placeholder', 'STUDENT', '2026-11-23 12:43:25.723 UTC');
+ROLLBACK;
+
+Run 1
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.122..0.123 rows=1 loops=1)
+  Buffers: shared hit=89
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.019..0.019 rows=1 loops=1)
+        Buffers: shared hit=16
+Planning:
+  Buffers: shared hit=21
+Planning Time: 0.068 ms
+Execution Time: 0.134 ms
+
+Run 2
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.008..0.008 rows=1 loops=1)
+  Buffers: shared hit=9
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.012 ms
+Execution Time: 0.011 ms
+
+Run 3
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.752..0.753 rows=1 loops=1)
+  Buffers: shared hit=11 dirtied=1 written=1
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.001..0.002 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.015 ms
+Execution Time: 0.762 ms

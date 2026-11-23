@@ -1,0 +1,36 @@
+# W10 · Insert a topic’s prerequisite links in the admin editor
+
+PREPARE trellis_query AS
+INSERT INTO "public"."TopicPrerequisite" ("topicId","prerequisiteId") VALUES ($1,$2), ($3,$4);
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(9, 4, 9, 5);
+ROLLBACK;
+
+Run 1
+Insert on "TopicPrerequisite"  (cost=0.00..0.03 rows=0 width=0) (actual time=0.081..0.081 rows=0 loops=1)
+  Buffers: shared hit=43
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=8) (actual time=0.000..0.001 rows=2 loops=1)
+Planning Time: 0.033 ms
+Trigger for constraint TopicPrerequisite_topicId_fkey: time=0.215 calls=2
+Trigger for constraint TopicPrerequisite_prerequisiteId_fkey: time=0.029 calls=2
+Execution Time: 0.333 ms
+
+Run 2
+Insert on "TopicPrerequisite"  (cost=0.00..0.03 rows=0 width=0) (actual time=0.006..0.006 rows=0 loops=1)
+  Buffers: shared hit=6
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=8) (actual time=0.000..0.000 rows=2 loops=1)
+Planning Time: 0.008 ms
+Trigger for constraint TopicPrerequisite_topicId_fkey: time=0.023 calls=2
+Trigger for constraint TopicPrerequisite_prerequisiteId_fkey: time=0.017 calls=2
+Execution Time: 0.049 ms
+
+Run 3
+Insert on "TopicPrerequisite"  (cost=0.00..0.03 rows=0 width=0) (actual time=0.006..0.006 rows=0 loops=1)
+  Buffers: shared hit=6
+  ->  Values Scan on "*VALUES*"  (cost=0.00..0.03 rows=2 width=8) (actual time=0.000..0.000 rows=2 loops=1)
+Planning Time: 0.004 ms
+Trigger for constraint TopicPrerequisite_topicId_fkey: time=0.016 calls=2
+Trigger for constraint TopicPrerequisite_prerequisiteId_fkey: time=0.014 calls=2
+Execution Time: 0.037 ms
