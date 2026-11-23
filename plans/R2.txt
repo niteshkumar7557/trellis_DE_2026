@@ -1,0 +1,38 @@
+# R2 · Load the signed-in user by ID
+
+PREPARE trellis_query AS
+SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId" FROM "public"."User" WHERE ("public"."User"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 1, 0);
+ROLLBACK;
+
+Run 1
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.010..0.010 rows=1 loops=1)
+  Buffers: shared hit=6
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.010..0.010 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=120
+Planning Time: 0.205 ms
+Execution Time: 0.018 ms
+
+Run 2
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.002..0.002 rows=1 loops=1)
+  Buffers: shared hit=3
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.002 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Buffers: shared hit=3
+Planning Time: 0.016 ms
+Execution Time: 0.004 ms
+
+Run 3
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.001 rows=1 loops=1)
+  Buffers: shared hit=3
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.001 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Buffers: shared hit=3
+Planning Time: 0.017 ms
+Execution Time: 0.003 ms

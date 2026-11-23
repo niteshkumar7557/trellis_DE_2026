@@ -1,0 +1,41 @@
+# W8 · Edit a topic in the admin editor
+
+PREPARE trellis_query AS
+UPDATE "public"."Topic" SET "name" = $1, "summary" = $2, "mistakes" = $3 WHERE ("public"."Topic"."id" = $4 AND 1=1) RETURNING "public"."Topic"."id", "public"."Topic"."subjectId", "public"."Topic"."slug", "public"."Topic"."name", "public"."Topic"."summary", "public"."Topic"."mistakes";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('Edited topic', 'Edited summary', ARRAY['Edited mistake'], 6);
+ROLLBACK;
+
+Run 1
+Update on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.034..0.039 rows=1 loops=1)
+  Buffers: shared hit=15
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.005..0.010 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 42
+        Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=85
+Planning Time: 0.166 ms
+Execution Time: 0.068 ms
+
+Run 2
+Update on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.011..0.012 rows=1 loops=1)
+  Buffers: shared hit=6
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.005..0.006 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 42
+        Buffers: shared hit=3
+Planning Time: 0.017 ms
+Execution Time: 0.015 ms
+
+Run 3
+Update on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.007..0.008 rows=1 loops=1)
+  Buffers: shared hit=6
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=102) (actual time=0.003..0.004 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 42
+        Buffers: shared hit=3
+Planning Time: 0.015 ms
+Execution Time: 0.011 ms

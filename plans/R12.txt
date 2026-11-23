@@ -1,0 +1,35 @@
+# R12 · Load the prerequisite topic records
+
+PREPARE trellis_query AS
+SELECT "public"."Topic"."id", "public"."Topic"."subjectId", "public"."Topic"."slug", "public"."Topic"."name", "public"."Topic"."summary", "public"."Topic"."mistakes" FROM "public"."Topic" WHERE "public"."Topic"."id" IN ($1,$2) OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(4, 5, 0);
+ROLLBACK;
+
+Run 1
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=2 width=262) (actual time=0.004..0.008 rows=2 loops=1)
+  Filter: (id = ANY ('{4,5}'::integer[]))
+  Rows Removed by Filter: 41
+  Buffers: shared hit=3
+Planning:
+  Buffers: shared hit=172
+Planning Time: 0.209 ms
+Execution Time: 0.013 ms
+
+Run 2
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=2 width=262) (actual time=0.002..0.003 rows=2 loops=1)
+  Filter: (id = ANY ('{4,5}'::integer[]))
+  Rows Removed by Filter: 41
+  Buffers: shared hit=3
+Planning Time: 0.016 ms
+Execution Time: 0.005 ms
+
+Run 3
+Seq Scan on "Topic"  (cost=0.00..3.80 rows=2 width=262) (actual time=0.002..0.003 rows=2 loops=1)
+  Filter: (id = ANY ('{4,5}'::integer[]))
+  Rows Removed by Filter: 41
+  Buffers: shared hit=3
+Planning Time: 0.013 ms
+Execution Time: 0.004 ms

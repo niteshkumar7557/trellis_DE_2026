@@ -1,0 +1,41 @@
+# W5 · Mark an unused refresh token as used
+
+PREPARE trellis_query AS
+UPDATE "public"."RefreshToken" SET "usedAt" = $1 WHERE ("public"."RefreshToken"."id" = $2 AND "public"."RefreshToken"."usedAt" IS NULL);
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('2026-11-23 12:00:00 UTC', 500);
+ROLLBACK;
+
+Run 1
+Update on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.070..0.071 rows=0 loops=1)
+  Buffers: shared hit=20
+  ->  Index Scan using "RefreshToken_pkey" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=14) (actual time=0.007..0.008 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Filter: ("usedAt" IS NULL)
+        Buffers: shared hit=5
+Planning:
+  Buffers: shared hit=84
+Planning Time: 0.192 ms
+Execution Time: 0.102 ms
+
+Run 2
+Update on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.013..0.013 rows=0 loops=1)
+  Buffers: shared hit=17
+  ->  Index Scan using "RefreshToken_pkey" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=14) (actual time=0.004..0.004 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Filter: ("usedAt" IS NULL)
+        Buffers: shared hit=5
+Planning Time: 0.019 ms
+Execution Time: 0.017 ms
+
+Run 3
+Update on "RefreshToken"  (cost=0.28..8.29 rows=0 width=0) (actual time=0.011..0.011 rows=0 loops=1)
+  Buffers: shared hit=17
+  ->  Index Scan using "RefreshToken_pkey" on "RefreshToken"  (cost=0.28..8.29 rows=1 width=14) (actual time=0.003..0.003 rows=1 loops=1)
+        Index Cond: (id = 500)
+        Filter: ("usedAt" IS NULL)
+        Buffers: shared hit=5
+Planning Time: 0.016 ms
+Execution Time: 0.014 ms

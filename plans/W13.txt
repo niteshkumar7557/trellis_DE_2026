@@ -1,0 +1,50 @@
+# W13 · Upsert progress on the update path with the note omitted
+
+PREPARE trellis_query AS
+INSERT INTO "public"."Progress" ("userId","topicId","status","note","updatedAt") VALUES ($1,$2,CAST($3::text AS "public"."Status"),$4,$5) ON CONFLICT ("userId","topicId") DO UPDATE SET "status" = CAST($6::text AS "public"."Status"), "updatedAt" = $7 WHERE (("public"."Progress"."userId" = $8 AND "public"."Progress"."topicId" = $9) AND 1=1) RETURNING "public"."Progress"."id", "public"."Progress"."userId", "public"."Progress"."topicId", "public"."Progress"."status"::text, "public"."Progress"."note", "public"."Progress"."updatedAt";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 1, 'STUCK', NULL, '2026-11-23 12:43:25.728 UTC', 'STUCK', '2026-11-23 12:43:25.728 UTC', 500, 1);
+ROLLBACK;
+
+Run 1
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.093..0.094 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 1))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=46
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.016..0.016 rows=1 loops=1)
+        Buffers: shared hit=16
+Planning:
+  Buffers: shared hit=65
+Planning Time: 0.087 ms
+Execution Time: 0.130 ms
+
+Run 2
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.012..0.013 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 1))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=16
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.014 ms
+Execution Time: 0.016 ms
+
+Run 3
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.010..0.010 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 1))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=16
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.016 ms
+Execution Time: 0.013 ms

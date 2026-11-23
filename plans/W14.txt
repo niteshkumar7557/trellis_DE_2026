@@ -1,0 +1,38 @@
+# W14 · Promote a user to admin by email (make-admin script)
+
+PREPARE trellis_query AS
+UPDATE "public"."User" SET "role" = CAST($1::text AS "public"."Role") WHERE ("public"."User"."email" = $2 AND 1=1) RETURNING "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('ADMIN', 'student500@example.test');
+ROLLBACK;
+
+Run 1
+Update on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.070..0.071 rows=1 loops=1)
+  Buffers: shared hit=32
+  ->  Index Scan using "User_email_key" on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.013..0.014 rows=1 loops=1)
+        Index Cond: (email = 'student500@example.test'::text)
+        Buffers: shared hit=8
+Planning:
+  Buffers: shared hit=112
+Planning Time: 0.202 ms
+Execution Time: 0.102 ms
+
+Run 2
+Update on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.013..0.013 rows=1 loops=1)
+  Buffers: shared hit=21
+  ->  Index Scan using "User_email_key" on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.004..0.004 rows=1 loops=1)
+        Index Cond: (email = 'student500@example.test'::text)
+        Buffers: shared hit=5
+Planning Time: 0.018 ms
+Execution Time: 0.017 ms
+
+Run 3
+Update on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.009..0.009 rows=1 loops=1)
+  Buffers: shared hit=21
+  ->  Index Scan using "User_email_key" on "User"  (cost=0.28..8.30 rows=1 width=10) (actual time=0.002..0.002 rows=1 loops=1)
+        Index Cond: (email = 'student500@example.test'::text)
+        Buffers: shared hit=5
+Planning Time: 0.009 ms
+Execution Time: 0.011 ms

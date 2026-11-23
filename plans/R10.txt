@@ -1,0 +1,41 @@
+# R10 · Find a topic by ID
+
+PREPARE trellis_query AS
+SELECT "public"."Topic"."id", "public"."Topic"."subjectId", "public"."Topic"."slug", "public"."Topic"."name", "public"."Topic"."summary", "public"."Topic"."mistakes" FROM "public"."Topic" WHERE ("public"."Topic"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(6, 1, 0);
+ROLLBACK;
+
+Run 1
+Limit  (cost=0.00..3.80 rows=1 width=262) (actual time=0.004..0.005 rows=1 loops=1)
+  Buffers: shared hit=2
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=262) (actual time=0.004..0.004 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 5
+        Buffers: shared hit=2
+Planning:
+  Buffers: shared hit=132
+Planning Time: 0.203 ms
+Execution Time: 0.011 ms
+
+Run 2
+Limit  (cost=0.00..3.80 rows=1 width=262) (actual time=0.001..0.001 rows=1 loops=1)
+  Buffers: shared hit=2
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=262) (actual time=0.001..0.001 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 5
+        Buffers: shared hit=2
+Planning Time: 0.015 ms
+Execution Time: 0.003 ms
+
+Run 3
+Limit  (cost=0.00..3.80 rows=1 width=262) (actual time=0.002..0.002 rows=1 loops=1)
+  Buffers: shared hit=2
+  ->  Seq Scan on "Topic"  (cost=0.00..3.80 rows=1 width=262) (actual time=0.001..0.001 rows=1 loops=1)
+        Filter: (id = 6)
+        Rows Removed by Filter: 5
+        Buffers: shared hit=2
+Planning Time: 0.016 ms
+Execution Time: 0.003 ms
