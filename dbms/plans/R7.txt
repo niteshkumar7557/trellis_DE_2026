@@ -1,0 +1,38 @@
+# R7 · Find a subject by ID
+
+PREPARE trellis_query AS
+SELECT "public"."Subject"."id", "public"."Subject"."slug", "public"."Subject"."name", "public"."Subject"."description" FROM "public"."Subject" WHERE ("public"."Subject"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(1, 1, 0);
+ROLLBACK;
+
+Run 1
+Limit  (cost=0.00..1.04 rows=1 width=105) (actual time=0.003..0.003 rows=1 loops=1)
+  Buffers: shared hit=1
+  ->  Seq Scan on "Subject"  (cost=0.00..1.04 rows=1 width=105) (actual time=0.002..0.002 rows=1 loops=1)
+        Filter: (id = 1)
+        Buffers: shared hit=1
+Planning:
+  Buffers: shared hit=94
+Planning Time: 0.163 ms
+Execution Time: 0.010 ms
+
+Run 2
+Limit  (cost=0.00..1.04 rows=1 width=105) (actual time=0.002..0.002 rows=1 loops=1)
+  Buffers: shared hit=1
+  ->  Seq Scan on "Subject"  (cost=0.00..1.04 rows=1 width=105) (actual time=0.001..0.001 rows=1 loops=1)
+        Filter: (id = 1)
+        Buffers: shared hit=1
+Planning Time: 0.016 ms
+Execution Time: 0.004 ms
+
+Run 3
+Limit  (cost=0.00..1.04 rows=1 width=105) (actual time=0.001..0.002 rows=1 loops=1)
+  Buffers: shared hit=1
+  ->  Seq Scan on "Subject"  (cost=0.00..1.04 rows=1 width=105) (actual time=0.001..0.001 rows=1 loops=1)
+        Filter: (id = 1)
+        Buffers: shared hit=1
+Planning Time: 0.013 ms
+Execution Time: 0.003 ms

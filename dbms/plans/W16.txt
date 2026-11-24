@@ -1,0 +1,50 @@
+# W16 · Upsert an existing topic by subject and slug (seed script)
+
+PREPARE trellis_query AS
+INSERT INTO "public"."Topic" ("subjectId","slug","name","summary","mistakes") VALUES ($1,$2,$3,$4,$5) ON CONFLICT ("subjectId","slug") DO UPDATE SET "name" = $6, "summary" = $7, "mistakes" = $8 WHERE (("public"."Topic"."subjectId" = $9 AND "public"."Topic"."slug" = $10) AND 1=1) RETURNING "public"."Topic"."id", "public"."Topic"."subjectId", "public"."Topic"."slug", "public"."Topic"."name", "public"."Topic"."summary", "public"."Topic"."mistakes";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(1, 'async-await', 'async and await', 'Writing promise code that reads top to bottom; try/catch with await', ARRAY['Forgetting await', 'awaiting in a loop when Promise.all would run them together'], 'async and await', 'Writing promise code that reads top to bottom; try/catch with await', ARRAY['Forgetting await', 'awaiting in a loop when Promise.all would run them together'], 1, 'async-await');
+ROLLBACK;
+
+Run 1
+Insert on "Topic"  (cost=0.00..0.01 rows=1 width=136) (actual time=0.056..0.056 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Topic_subjectId_slug_key
+  Conflict Filter: (("Topic"."subjectId" = 1) AND ("Topic".slug = 'async-await'::text))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=35
+  ->  Result  (cost=0.00..0.01 rows=1 width=136) (actual time=0.011..0.012 rows=1 loops=1)
+        Buffers: shared hit=13
+Planning:
+  Buffers: shared hit=56
+Planning Time: 0.085 ms
+Execution Time: 0.098 ms
+
+Run 2
+Insert on "Topic"  (cost=0.00..0.01 rows=1 width=136) (actual time=0.011..0.011 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Topic_subjectId_slug_key
+  Conflict Filter: (("Topic"."subjectId" = 1) AND ("Topic".slug = 'async-await'::text))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=6
+  ->  Result  (cost=0.00..0.01 rows=1 width=136) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.014 ms
+Execution Time: 0.014 ms
+
+Run 3
+Insert on "Topic"  (cost=0.00..0.01 rows=1 width=136) (actual time=0.007..0.007 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Topic_subjectId_slug_key
+  Conflict Filter: (("Topic"."subjectId" = 1) AND ("Topic".slug = 'async-await'::text))
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=6
+  ->  Result  (cost=0.00..0.01 rows=1 width=136) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.017 ms
+Execution Time: 0.010 ms

@@ -1,0 +1,38 @@
+# W4 · Issue a refresh token
+
+PREPARE trellis_query AS
+INSERT INTO "public"."RefreshToken" ("tokenHash","userId","expiresAt","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."RefreshToken"."id", "public"."RefreshToken"."tokenHash", "public"."RefreshToken"."userId", "public"."RefreshToken"."expiresAt", "public"."RefreshToken"."usedAt", "public"."RefreshToken"."createdAt";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('benchmark-token-new', 500, '2026-11-23 12:00:00 UTC', '2026-11-23 12:43:25.725 UTC');
+ROLLBACK;
+
+Run 1
+Insert on "RefreshToken"  (cost=0.00..0.01 rows=1 width=64) (actual time=0.104..0.104 rows=1 loops=1)
+  Buffers: shared hit=68
+  ->  Result  (cost=0.00..0.01 rows=1 width=64) (actual time=0.012..0.012 rows=1 loops=1)
+        Buffers: shared hit=13
+Planning:
+  Buffers: shared hit=6
+Planning Time: 0.051 ms
+Trigger for constraint RefreshToken_userId_fkey: time=0.214 calls=1
+Execution Time: 0.327 ms
+
+Run 2
+Insert on "RefreshToken"  (cost=0.00..0.01 rows=1 width=64) (actual time=0.007..0.007 rows=1 loops=1)
+  Buffers: shared hit=7
+  ->  Result  (cost=0.00..0.01 rows=1 width=64) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.015 ms
+Trigger for constraint RefreshToken_userId_fkey: time=0.026 calls=1
+Execution Time: 0.037 ms
+
+Run 3
+Insert on "RefreshToken"  (cost=0.00..0.01 rows=1 width=64) (actual time=0.006..0.006 rows=1 loops=1)
+  Buffers: shared hit=7
+  ->  Result  (cost=0.00..0.01 rows=1 width=64) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.010 ms
+Trigger for constraint RefreshToken_userId_fkey: time=0.012 calls=1
+Execution Time: 0.021 ms

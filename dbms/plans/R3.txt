@@ -1,0 +1,38 @@
+# R3 · Find a returning Google user by Google ID
+
+PREPARE trellis_query AS
+SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId" FROM "public"."User" WHERE ("public"."User"."googleId" = $1 AND 1=1) LIMIT $2 OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('benchmark-google-500', 1, 0);
+ROLLBACK;
+
+Run 1
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.012..0.012 rows=1 loops=1)
+  Buffers: shared hit=6
+  ->  Index Scan using "User_googleId_key" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.012..0.012 rows=1 loops=1)
+        Index Cond: ("googleId" = 'benchmark-google-500'::text)
+        Buffers: shared hit=6
+Planning:
+  Buffers: shared hit=123
+Planning Time: 0.211 ms
+Execution Time: 0.021 ms
+
+Run 2
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.002..0.002 rows=1 loops=1)
+  Buffers: shared hit=3
+  ->  Index Scan using "User_googleId_key" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.001 rows=1 loops=1)
+        Index Cond: ("googleId" = 'benchmark-google-500'::text)
+        Buffers: shared hit=3
+Planning Time: 0.013 ms
+Execution Time: 0.004 ms
+
+Run 3
+Limit  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.001 rows=1 loops=1)
+  Buffers: shared hit=3
+  ->  Index Scan using "User_googleId_key" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.001..0.001 rows=1 loops=1)
+        Index Cond: ("googleId" = 'benchmark-google-500'::text)
+        Buffers: shared hit=3
+Planning Time: 0.010 ms
+Execution Time: 0.003 ms

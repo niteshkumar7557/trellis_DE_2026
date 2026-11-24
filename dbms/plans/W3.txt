@@ -1,0 +1,38 @@
+# W3 · Link Google to an existing user
+
+PREPARE trellis_query AS
+UPDATE "public"."User" SET "googleId" = $1 WHERE ("public"."User"."id" = $2 AND 1=1) RETURNING "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('benchmark-google-linked', 501);
+ROLLBACK;
+
+Run 1
+Update on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.067..0.067 rows=1 loops=1)
+  Buffers: shared hit=29
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.005..0.006 rows=1 loops=1)
+        Index Cond: (id = 501)
+        Buffers: shared hit=5
+Planning:
+  Buffers: shared hit=97
+Planning Time: 0.197 ms
+Execution Time: 0.103 ms
+
+Run 2
+Update on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.012..0.013 rows=1 loops=1)
+  Buffers: shared hit=20
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.003..0.003 rows=1 loops=1)
+        Index Cond: (id = 501)
+        Buffers: shared hit=5
+Planning Time: 0.017 ms
+Execution Time: 0.016 ms
+
+Run 3
+Update on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.010..0.010 rows=1 loops=1)
+  Buffers: shared hit=20
+  ->  Index Scan using "User_pkey" on "User"  (cost=0.28..8.29 rows=1 width=38) (actual time=0.002..0.002 rows=1 loops=1)
+        Index Cond: (id = 501)
+        Buffers: shared hit=5
+Planning Time: 0.015 ms
+Execution Time: 0.013 ms

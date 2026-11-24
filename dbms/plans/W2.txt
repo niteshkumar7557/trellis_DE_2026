@@ -1,0 +1,35 @@
+# W2 · Create a Google account
+
+PREPARE trellis_query AS
+INSERT INTO "public"."User" ("email","name","role","createdAt","googleId") VALUES ($1,$2,CAST($3::text AS "public"."Role"),$4,$5) RETURNING "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('google-new@example.test', 'New student', 'STUDENT', '2026-11-23 12:43:25.724 UTC', 'benchmark-google-new');
+ROLLBACK;
+
+Run 1
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.095..0.095 rows=1 loops=1)
+  Buffers: shared hit=90
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.016..0.016 rows=1 loops=1)
+        Buffers: shared hit=16
+Planning:
+  Buffers: shared hit=21
+Planning Time: 0.066 ms
+Execution Time: 0.105 ms
+
+Run 2
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.009..0.009 rows=1 loops=1)
+  Buffers: shared hit=10
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.014 ms
+Execution Time: 0.013 ms
+
+Run 3
+Insert on "User"  (cost=0.00..0.02 rows=1 width=144) (actual time=0.008..0.008 rows=1 loops=1)
+  Buffers: shared hit=10
+  ->  Result  (cost=0.00..0.02 rows=1 width=144) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.012 ms
+Execution Time: 0.011 ms

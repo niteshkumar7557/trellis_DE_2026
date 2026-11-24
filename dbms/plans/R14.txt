@@ -1,0 +1,54 @@
+# R14 · Read the progress fields shown on the map
+
+PREPARE trellis_query AS
+SELECT "public"."Progress"."id", "public"."Progress"."topicId", "public"."Progress"."status"::text, "public"."Progress"."note", "public"."Progress"."updatedAt" FROM "public"."Progress" LEFT JOIN "public"."Topic" AS "j0" ON ("j0"."id") = ("public"."Progress"."topicId") WHERE ("public"."Progress"."userId" = $1 AND ("j0"."subjectId" = $2 AND ("j0"."id" IS NOT NULL))) OFFSET $3;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 1, 0);
+ROLLBACK;
+
+Run 1
+Merge Join  (cost=0.42..23.64 rows=3 width=80) (actual time=0.011..0.017 rows=8 loops=1)
+  Merge Cond: ("Progress"."topicId" = j0.id)
+  Buffers: shared hit=24
+  ->  Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..20.67 rows=8 width=52) (actual time=0.004..0.006 rows=8 loops=1)
+        Index Cond: ("userId" = 500)
+        Buffers: shared hit=7
+  ->  Index Scan using "Topic_pkey" on "Topic" j0  (cost=0.14..15.26 rows=22 width=4) (actual time=0.001..0.004 rows=8 loops=1)
+        Filter: ("subjectId" = 1)
+        Buffers: shared hit=14
+Planning:
+  Buffers: shared hit=269
+Planning Time: 0.354 ms
+Execution Time: 0.033 ms
+
+Run 2
+Merge Join  (cost=0.42..23.64 rows=3 width=80) (actual time=0.003..0.005 rows=8 loops=1)
+  Merge Cond: ("Progress"."topicId" = j0.id)
+  Buffers: shared hit=5
+  ->  Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..20.67 rows=8 width=52) (actual time=0.001..0.001 rows=8 loops=1)
+        Index Cond: ("userId" = 500)
+        Buffers: shared hit=3
+  ->  Index Scan using "Topic_pkey" on "Topic" j0  (cost=0.14..15.26 rows=22 width=4) (actual time=0.001..0.001 rows=8 loops=1)
+        Filter: ("subjectId" = 1)
+        Buffers: shared hit=2
+Planning:
+  Buffers: shared hit=2
+Planning Time: 0.044 ms
+Execution Time: 0.008 ms
+
+Run 3
+Merge Join  (cost=0.42..23.64 rows=3 width=80) (actual time=0.002..0.004 rows=8 loops=1)
+  Merge Cond: ("Progress"."topicId" = j0.id)
+  Buffers: shared hit=5
+  ->  Index Scan using "Progress_userId_topicId_key" on "Progress"  (cost=0.28..20.67 rows=8 width=52) (actual time=0.001..0.001 rows=8 loops=1)
+        Index Cond: ("userId" = 500)
+        Buffers: shared hit=3
+  ->  Index Scan using "Topic_pkey" on "Topic" j0  (cost=0.14..15.26 rows=22 width=4) (actual time=0.001..0.001 rows=8 loops=1)
+        Filter: ("subjectId" = 1)
+        Buffers: shared hit=2
+Planning:
+  Buffers: shared hit=2
+Planning Time: 0.037 ms
+Execution Time: 0.007 ms

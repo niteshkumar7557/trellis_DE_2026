@@ -1,0 +1,56 @@
+# W12 · Upsert progress on the insert path
+
+PREPARE trellis_query AS
+INSERT INTO "public"."Progress" ("userId","topicId","status","note","updatedAt") VALUES ($1,$2,CAST($3::text AS "public"."Status"),$4,$5) ON CONFLICT ("userId","topicId") DO UPDATE SET "status" = CAST($6::text AS "public"."Status"), "note" = $7, "updatedAt" = $8 WHERE (("public"."Progress"."userId" = $9 AND "public"."Progress"."topicId" = $10) AND 1=1) RETURNING "public"."Progress"."id", "public"."Progress"."userId", "public"."Progress"."topicId", "public"."Progress"."status"::text, "public"."Progress"."note", "public"."Progress"."updatedAt";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 9, 'STUCK', 'Benchmark note', '2026-11-23 12:43:25.728 UTC', 'STUCK', 'Benchmark note', '2026-11-23 12:43:25.728 UTC', 500, 9);
+ROLLBACK;
+
+Run 1
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.076..0.076 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 9))
+  Tuples Inserted: 1
+  Conflicting Tuples: 0
+  Buffers: shared hit=34
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.017..0.017 rows=1 loops=1)
+        Buffers: shared hit=16
+Planning:
+  Buffers: shared hit=65
+Planning Time: 0.086 ms
+Trigger for constraint Progress_userId_fkey: time=0.179 calls=1
+Trigger for constraint Progress_topicId_fkey: time=0.088 calls=1
+Execution Time: 0.377 ms
+
+Run 2
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.008..0.008 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 9))
+  Tuples Inserted: 1
+  Conflicting Tuples: 0
+  Buffers: shared hit=10
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.017 ms
+Trigger for constraint Progress_userId_fkey: time=0.015 calls=1
+Trigger for constraint Progress_topicId_fkey: time=0.010 calls=1
+Execution Time: 0.037 ms
+
+Run 3
+Insert on "Progress"  (cost=0.00..0.02 rows=1 width=56) (actual time=0.006..0.006 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Progress_userId_topicId_key
+  Conflict Filter: (("Progress"."userId" = 500) AND ("Progress"."topicId" = 9))
+  Tuples Inserted: 1
+  Conflicting Tuples: 0
+  Buffers: shared hit=10
+  ->  Result  (cost=0.00..0.02 rows=1 width=56) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.016 ms
+Trigger for constraint Progress_userId_fkey: time=0.011 calls=1
+Trigger for constraint Progress_topicId_fkey: time=0.009 calls=1
+Execution Time: 0.029 ms

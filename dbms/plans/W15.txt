@@ -1,0 +1,50 @@
+# W15 · Upsert an existing subject by slug (seed script)
+
+PREPARE trellis_query AS
+INSERT INTO "public"."Subject" ("slug","name","description") VALUES ($1,$2,$3) ON CONFLICT ("slug") DO UPDATE SET "name" = $4, "description" = $5 WHERE ("public"."Subject"."slug" = $6 AND 1=1) RETURNING "public"."Subject"."id", "public"."Subject"."slug", "public"."Subject"."name", "public"."Subject"."description";
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query('javascript', 'JavaScript fundamentals', 'Learn JavaScript fundamentals in topic order.', 'JavaScript fundamentals', 'Learn JavaScript fundamentals in topic order.', 'javascript');
+ROLLBACK;
+
+Run 1
+Insert on "Subject"  (cost=0.00..0.01 rows=1 width=100) (actual time=0.050..0.050 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Subject_slug_key
+  Conflict Filter: ("Subject".slug = 'javascript'::text)
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=29
+  ->  Result  (cost=0.00..0.01 rows=1 width=100) (actual time=0.011..0.011 rows=1 loops=1)
+        Buffers: shared hit=13
+Planning:
+  Buffers: shared hit=53
+Planning Time: 0.071 ms
+Execution Time: 0.082 ms
+
+Run 2
+Insert on "Subject"  (cost=0.00..0.01 rows=1 width=100) (actual time=0.008..0.008 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Subject_slug_key
+  Conflict Filter: ("Subject".slug = 'javascript'::text)
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=6
+  ->  Result  (cost=0.00..0.01 rows=1 width=100) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.012 ms
+Execution Time: 0.011 ms
+
+Run 3
+Insert on "Subject"  (cost=0.00..0.01 rows=1 width=100) (actual time=0.006..0.006 rows=1 loops=1)
+  Conflict Resolution: UPDATE
+  Conflict Arbiter Indexes: Subject_slug_key
+  Conflict Filter: ("Subject".slug = 'javascript'::text)
+  Tuples Inserted: 0
+  Conflicting Tuples: 1
+  Buffers: shared hit=6
+  ->  Result  (cost=0.00..0.01 rows=1 width=100) (actual time=0.001..0.001 rows=1 loops=1)
+        Buffers: shared hit=1
+Planning Time: 0.011 ms
+Execution Time: 0.009 ms

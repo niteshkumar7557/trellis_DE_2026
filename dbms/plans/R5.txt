@@ -1,0 +1,32 @@
+# R5 · Load the refresh token’s user
+
+PREPARE trellis_query AS
+SELECT "public"."User"."id", "public"."User"."email", "public"."User"."name", "public"."User"."passwordHash", "public"."User"."role"::text, "public"."User"."createdAt", "public"."User"."googleId" FROM "public"."User" WHERE "public"."User"."id" IN ($1) OFFSET $2;
+
+For each run:
+BEGIN;
+EXPLAIN (ANALYZE, BUFFERS) EXECUTE trellis_query(500, 0);
+ROLLBACK;
+
+Run 1
+Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.012..0.014 rows=1 loops=1)
+  Index Cond: (id = 500)
+  Buffers: shared hit=8
+Planning:
+  Buffers: shared hit=120
+Planning Time: 0.216 ms
+Execution Time: 0.023 ms
+
+Run 2
+Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.002..0.002 rows=1 loops=1)
+  Index Cond: (id = 500)
+  Buffers: shared hit=3
+Planning Time: 0.015 ms
+Execution Time: 0.004 ms
+
+Run 3
+Index Scan using "User_pkey" on "User"  (cost=0.28..8.30 rows=1 width=120) (actual time=0.002..0.002 rows=1 loops=1)
+  Index Cond: (id = 500)
+  Buffers: shared hit=3
+Planning Time: 0.017 ms
+Execution Time: 0.005 ms
